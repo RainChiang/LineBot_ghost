@@ -1,5 +1,8 @@
+require 'line/bot'
+
 class GhostController < ApplicationController
 	protect_from_forgery with: :null_session
+
 	def eat
 		render plain: "吃土"
 	end
@@ -24,8 +27,25 @@ class GhostController < ApplicationController
 		puts "===這是設定後的response.body:#{response.body}==="
 	end
 	def webhook
-		#head :ok 
-		render plain: params
+		#Line Bot API 物件初始化
+		client = Line::Bot::Client.new{ |config|
+			config.channel_secret = 'd29f7948cfce5e73858fd254b6d7062f'
+			config.channel_token = '6vEAtJvG2yP4t8y3h759cqhgPNCAxcgKLjrK/ARCJD48vEyyUZXtqgDkoVswqBhkwNBTa5ijM5h1I4h7vacDA6squrN7Zv7QFiyU/nr/baIxr4zLKLR/6MMCTGa5Y2p3vYmE0iRYGMPOx90xDWmpCQdB04t89/1O/w1cDnyilFU='
+		}
+		#取得 reply token
+		reply_token = params['events'][0]['replyToken']
+
+		#設定回復訊息
+		message = {
+			type: 'text',
+			text: '讓我靜靜...(ghost)'
+		}
+
+		#傳送訊息
+		response = client.reply_message(reply_token, message)
+
+		#回應200
+		head: ok
 	end
 	def sent_request
 		uri = URI('http://localhost:3000/ghost/eat')
